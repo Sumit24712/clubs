@@ -1,0 +1,164 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Club Portal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Welcome to College Club Portal</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="clubs.html">Clubs</a>
+      <a href="register.html">Register</a>
+    </nav>
+  </header>
+  <main>
+    <p>Discover and register for exciting clubs and committees in your college.</p>
+  </main>
+</body>
+</html>
+
+<!-- clubs.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clubs</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Available Clubs</h1>
+  <ul id="clubList"></ul>
+  <a href="register.html"><button>Register Now</button></a>
+  <script src="script.js" type="module"></script>
+</body>
+</html>
+
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Register for a Club</h2>
+  <form id="regForm">
+    <input type="text" placeholder="Full Name" required />
+    <input type="email" placeholder="Email" required />
+    <select id="clubSelect">
+      <option value="">Select Club</option>
+    </select>
+    <button type="submit">Submit</button>
+  </form>
+  <script src="script.js" type="module"></script>
+</body>
+</html>
+
+/* style.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f3f3;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+header {
+  background: #0055aa;
+  color: white;
+  padding: 1rem;
+}
+
+nav a {
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+}
+
+form input, form select, form button {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.5rem;
+  width: 80%;
+  max-width: 300px;
+}
+
+button {
+  background-color: #0077cc;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005fa3;
+}
+
+/* script.js */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const clubs = ["Coding Club", "Drama Society", "Music Club", "Literary Committee"];
+
+window.onload = () => {
+  const list = document.getElementById("clubList");
+  const select = document.getElementById("clubSelect");
+
+  if (list) {
+    clubs.forEach(club => {
+      const li = document.createElement("li");
+      li.textContent = club;
+      list.appendChild(li);
+    });
+  }
+
+  if (select) {
+    clubs.forEach(club => {
+      const option = document.createElement("option");
+      option.value = club;
+      option.text = club;
+      select.appendChild(option);
+    });
+
+    document.getElementById("regForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = e.target[0].value;
+      const email = e.target[1].value;
+      const club = e.target[2].value;
+
+      try {
+        await addDoc(collection(db, "registrations"), {
+          name,
+          email,
+          club,
+          timestamp: new Date()
+        });
+        alert("Registration Successful!");
+        e.target.reset();
+      } catch (err) {
+        alert("Error: " + err.message);
+      }
+    });
+  }
+};
